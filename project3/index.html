@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Savings Calculator</title>
+</head>
+<body>
+	<h1>The Importance of Savings</h1>
+	<p>Saving money is crucial for achieving financial stability and reaching financial goals. Whether you want to build an emergency fund, save for a down payment on a house, or invest in your retirement, having a savings plan in place is key.</p>
+	<hr>
+	<h2>Savings Calculator</h2>
+	<form>
+		<label for="currAmnt">Current Savings Amount:</label>
+		<input type="text" id="currAmnt"><br><br>
+		<label for="goal">Savings Goal:</label>
+		<input type="text" id="goal"><br><br>
+		<label for="deposit">Monthly Deposit Amount:</label>
+		<input type="text" id="deposit"><br><br>
+		<button type="button" onclick="calculate()">Calculate</button>
+	</form>
+	<p id="result"></p>
+
+	<script>
+function calculate() {
+  // Get user input values
+  var currAmnt = parseFloat(document.getElementById("currAmnt").value);
+  var goal = parseFloat(document.getElementById("goal").value);
+  var deposit = parseFloat(document.getElementById("deposit").value);
+
+  // Calculate number of months needed to reach savings goal
+  var months = 0;
+  var savings = currAmnt;
+  while (savings < goal) {
+    savings += deposit;
+    months++;
+  }
+
+  // Update the result display
+  var result = document.getElementById("result");
+  result.textContent = "With $" + currAmnt.toFixed(0) + " in savings and saving $" + deposit.toFixed(0) + " a month, it will take you " + months + " months to save $" + goal.toFixed(0) + ".";
+}
+
+	</script>
+</body>
+</html>
