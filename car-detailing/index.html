@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pristine Auto Detailing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
+        }
+        header {
+            background: #222;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background: #444;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+        }
+        nav a:hover {
+            background: #555;
+        }
+        .hero {
+            background: url("img.jpg") center center/cover no-repeat;
+            text-align: center;
+            padding: 100px 0;
+            color: #fff;
+        }
+        .hero h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .section {
+            padding: 40px;
+            text-align: center;
+        }
+        .services {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .service {
+            flex: 1 1 30%;
+            background: #fff;
+            margin: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .service:hover {
+            transform: scale(1.05);
+        }
+        .service img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        footer {
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pristine Auto Detailing</h1>
+        <p>Your car deserves the best!</p>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="services.html">Services</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="hero">
+        <h1>Get Your Car Sparkling Clean</h1>
+        <p><b>Professional detailing for all vehicles</b></p>
+    </div>
+    <section id="about" class="section">
+        <h2>About Us</h2>
+        <p>At Pristine Auto Detailing, we pride ourselves on providing top-notch car detailing services to keep your vehicle looking like new. With years of experience and a passion for excellence, our team guarantees satisfaction for every customer.</p>
+    </section>
+    <section id="services" class="section">
+        <h2>Our Services</h2>
+        <div class="services">
+            <div class="service">
+                <h3>Exterior Wash & Wax</h3>
+                <img src="ext.png" alt="Exterior Wash & Wax">
+                <p>Thorough washing and waxing to restore your car's shine and protect its paint.</p>
+            </div>
+            <div class="service">
+                <h3>Interior Cleaning</h3>
+                <img src="int.jpg" alt="Interior Cleaning">
+                <p>Deep cleaning of carpets, seats, and all interior surfaces for a fresh look and feel.</p>
+            </div>
+            <div class="service">
+                <h3>Engine Detailing</h3>
+                <img src="eng.jpg" alt="Engine Detailing">
+                <p>Professional engine cleaning to keep your vehicle running smoothly and looking great.</p>
+            </div>
+        </div>
+    </section>
+    <section id="contact" class="section">
+        <h2>Contact Us</h2>
+        <p>Ready to make your car look its best? Contact us today!</p>
+        <p><strong>Email:</strong> pagelrepair@outlook.com</p>
+        <p><strong>Phone:</strong> (859) 595-9159</p>
+    </section>
+    <footer>
+        <p>&copy; 2025 Pristine Auto Detailing. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
