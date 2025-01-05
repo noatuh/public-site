@@ -5,73 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Services - PagelRepair</title>
     <style>
-       body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #e0e0e0;
-        }
-        header {
-            background: #228b22;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            background: #32cd32;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 15px 20px;
-            display: block;
-        }
-        nav a:hover {
-            background: #98fb98;
-        }
-        .hero {
-            background: url("repair-tools.jpg") no-repeat center center/cover;
-            text-align: center;
-            padding: 100px 0;
-            color: white;
-        }
-        .hero h1 {
-            font-size: 3em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        .section {
-            padding: 40px;
-            text-align: center;
-        }
-        .services {
-            display: flex;
-        }
-        .service {
-            flex: 1 0 20%;
-            box-sizing: border-box;
-            background: #fff;
-            margin: 5px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-        .service:hover {
-            transform: scale(1.05);
-        }
-        .service img {
-            max-width: 100%;
-            border-radius: 10px;
-        }
-        footer {
-            background: #228b22;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-        }
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    color: #333;
+}
+
+/* Header Styles */
+header {
+    background: #4caf50;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+/* Navigation Styles */
+nav {
+    background: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #4caf50;
+}
+
+/* Section Styles */
+.section {
+    padding: 20px;
+    text-align: center;
+}
+
+.section h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Services Section */
+.services {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+
+.service {
+    flex: 1 1 22%;
+    max-width: 22%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.service h3 {
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+.service img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.service p {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Footer Styles */
+footer {
+    background: #4caf50;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+}
+
     </style>
 </head>
 <body>

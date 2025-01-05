@@ -3,79 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PagelRepair - Small Engine Experts</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Repair Services</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
+            background: #f4f4f4;
             color: #333;
-            background-color: #e0e0e0;
         }
         header {
-            background: #228b22;
+            background: #4caf50;
             color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        nav {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #4caf50;
+        }
+        .section {
             padding: 20px;
             text-align: center;
         }
-        nav {
-            display: flex;
-            justify-content: center;
-            background: #32cd32;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 15px 20px;
-            display: block;
-        }
-        nav a:hover {
-            background: #98fb98;
-        }
-        .hero {
-            background: url("repair-tools.jpg") no-repeat center center/cover;
-            text-align: center;
-            padding: 100px 20px;
-            color: white;
-            position: relative;
-        }
-        .hero h1 {
-            font-size: 3em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        .hero p {
-            font-size: 1.5em;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-        }
-        .section {
-            padding: 40px;
-            text-align: center;
+        .section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
         }
         .services {
             display: flex;
             justify-content: space-around;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            gap: 10px;
         }
         .service {
-            flex: 1 1 30%;
+            flex: 1 1 22%;
+            max-width: 22%;
             background: #fff;
-            margin: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
             border-radius: 10px;
-            transition: transform 0.3s;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: left;
         }
-        .service:hover {
-            transform: scale(1.05);
+        .service h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
         }
         .service img {
-            max-width: 100%;
+            width: 100%;
             border-radius: 10px;
         }
+        .service p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
         footer {
-            background: #228b22;
-            color: white;
+            background: #4caf50;
+            color: #fff;
             text-align: center;
             padding: 10px 0;
         }
@@ -83,8 +85,8 @@
 </head>
 <body>
     <header>
-        <h1>PagelRepair</h1>
-        <p>Your Trusted Local Small Engine Repair Experts</p>
+        <h1>Pagel Repair</h1>
+        <p>Your one-stop solution for all repair needs!</p> 
     </header>
     <nav>
         <a href="index.html">Home</a>
@@ -92,47 +94,48 @@
         <a href="services.html">Services</a>
         <a href="contact.html">Contact</a>
     </nav>
-    <div class="hero">
-        <h1>Reliable Repairs, Every Time</h1>
-        <p><b>Specializing in small engine maintenance and repair</b></p>
-    </div>
-    <section id="about" class="section">
-        <h2>About Us</h2>
-        <p>PagelRepair is a family-owned business, led by Cameron Pagel, dedicated to providing exceptional repair services for minibikes, lawn equipment, dirt bikes, generators, and more. If it has a small engine, whether it's a 2-stroke or 4-stroke, we can fix it. With years of experience and a commitment to quality, we ensure your equipment is running like new.</p>
-    </section>
-    <section id="services" class="section">
-        <h2>Our Services</h2>
-        <div class="services">
-            <div class="service">
-                <h3>Minibike Repair</h3>
-                <img src="minibike.jpg" alt="Minibike Repair">
-                <p>Comprehensive repairs to get your minibike back on the trail or track.</p>
+    <main>
+        <section id="welcome" class="section">
+            <h2>Welcome to Our Website</h2>
+            <p>Your one-stop solution for minibike repair, lawn equipment maintenance, dirt bike repair, and generator service. We are here to keep your equipment running at its best!</p>
+        </section>
+        <section id="services" class="section">
+            <h2>Our Services</h2>
+            <div class="services">
+                <div class="service">
+                    <h3>Minibike Repair</h3>
+                    <img src="minibike.jpg" alt="Minibike Repair">
+                    <p>Comprehensive repairs to get your minibike back on the trail or track.</p>
+                </div>
+                <div class="service">
+                    <h3>Lawn Equipment Maintenance</h3>
+                    <img src="lawn-equipment.jpg" alt="Lawn Equipment Maintenance">
+                    <p>Keep your mowers and trimmers in top shape for a perfect yard.</p>
+                </div>
+                <div class="service">
+                    <h3>Dirt Bike Repair</h3>
+                    <img src="dirt-bike.jpg" alt="Dirt Bike Repair">
+                    <p>Expert engine tuning and repair to keep your dirt bike running smoothly.</p>
+                </div>
+                <div class="service">
+                    <h3>Generator Service</h3>
+                    <img src="generator.jpg" alt="Generator Service">
+                    <p>Ensure your generator is ready for any emergency or outdoor adventure.</p>
+                </div>
             </div>
-            <div class="service">
-                <h3>Lawn Equipment Maintenance</h3>
-                <img src="lawn-equipment.jpg" alt="Lawn Equipment Maintenance">
-                <p>Keep your mowers and trimmers in top shape for a perfect yard.</p>
-            </div>
-            <div class="service">
-                <h3>Dirt Bike Repair</h3>
-                <img src="dirt-bike.jpg" alt="Dirt Bike Repair">
-                <p>Expert engine tuning and repair to keep your dirt bike running smoothly.</p>
-            </div>
-            <div class="service">
-                <h3>Generator Service</h3>
-                <img src="generator.jpg" alt="Generator Service">
-                <p>Ensure your generator is ready for any emergency or outdoor adventure.</p>
-            </div>
-        </div>
-    </section>
-    <section id="contact" class="section">
-        <h2>Contact Us</h2>
-        <p>Ready to get your equipment running smoothly? Contact us today!</p>
-        <p><strong>Email:</strong> pagelrepair@outlook.com</p>
-        <p><strong>Phone:</strong> (859)-595-9159</p>
-    </section>
+        </section>
+        <section id="about" class="section">
+            <h2>About Us</h2>
+            <p>With years of experience and a dedicated team of professionals, we provide top-notch repair services for all your essential equipment. Trust us to deliver quality and reliability every time.</p>
+        </section>
+        <section id="contact" class="section">
+            <h2>Contact Us</h2>
+            <p>Email: pagelrepair@outlook.com</p>
+            <p>Phone: (859) 595-9159</p>
+        </section>
+    </main>
     <footer>
-        <p>&copy; 2025 PagelRepair. All Rights Reserved.</p>
+        <p>&copy; 2025 Repair Services. All Rights Reserved.</p>
     </footer>
 </body>
 </html>
