@@ -255,8 +255,34 @@
             
         </section>
     </main>
+    <div id="scrollPrompt" style="
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4fb3d4;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  z-index: 9999;
+  transition: opacity 0.5s ease-out;
+">
+  Scroll down to learn more!
+</div>
     <footer>
         <p>&copy; 2024 Mark Knight</p>
     </footer>
+    <script>
+  window.addEventListener('scroll', function() {
+    const scrollPrompt = document.getElementById('scrollPrompt');
+    if (window.scrollY > 0) {
+      scrollPrompt.style.opacity = '0';
+      setTimeout(() => {
+        scrollPrompt.style.display = 'none';
+      }, 500);
+    }
+  });
+</script>
 </body>
 </html>
