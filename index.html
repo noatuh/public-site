@@ -5,17 +5,44 @@
     <title>Mark Knight - Computer Technician</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+            --header-bg: #4fb3d4;
+            --header-text: #fff;
+            --card-bg: #fff;
+            --card-border: #ccc;
+            --about-bg: #e2e8f0;
+            --table-border: #ccc;
+            --hover-bg: #72c4e5;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #222;
+            --text-color: #eee;
+            --header-bg: #2d6a81;
+            --header-text: #fff;
+            --card-bg: #333;
+            --card-border: #444;
+            --about-bg: #2c3544;
+            --table-border: #555;
+            --hover-bg: #3a7c98;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+        
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
         }
         header {
-            background: #4fb3d4;
-            color: #fff;
+            background: var(--header-bg);
+            color: var(--header-text);
             padding: 20px;
             text-align: center;
         }
@@ -24,20 +51,20 @@
             font-size: 2.5em;
         }
         nav {
-            background: #4fb3d4;
+            background: var(--header-bg);
             display: flex;
             justify-content: center;
             padding: 10px;
         }
         nav a {
-            color: #fff;
+            color: var(--header-text);
             text-decoration: none;
             padding: 10px 15px;
             font-weight: bold;
             transition: background 0.3s;
         }
         nav a:hover {
-            background: #72c4e5;
+            background: var(--hover-bg);
         }
         .main-content {
             max-width: 1200px;
@@ -51,10 +78,10 @@
             justify-content: space-around;
         }
         .card {
-            background: #fff;
-            border: 1px solid #ccc;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px var(--shadow-color);
             width: 30%;
             overflow: hidden;
             transition: transform 0.3s;
@@ -72,8 +99,8 @@
             display: block;
         }
         .card .card-footer {
-            background: #4fb3d4;
-            color: #fff;
+            background: var(--header-bg);
+            color: var(--header-text);
             text-align: center;
             padding: 15px;
             font-weight: bold;
@@ -98,8 +125,8 @@
         footer {
             text-align: center;
             padding: 10px;
-            background: #4fb3d4;
-            color: #fff;
+            background: var(--header-bg);
+            color: var(--header-text);
             margin-top: 20px;
         }
         .about-me {
@@ -107,7 +134,7 @@
             gap: 20px;
             align-items: center;
             margin: 40px 0;
-            background: #e2e8f0;
+            background: var(--about-bg);
             padding: 20px;
             border-radius: 5px;
         }
@@ -122,7 +149,7 @@
         }
         .about-me-image img {
             border-radius: 50%;
-            border: 4px solid #4fb3d4;
+            border: 4px solid var(--header-bg);
             max-width: 300px;
         }
         .skills-table {
@@ -133,7 +160,36 @@
         }
         .skills-table td {
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--table-border);
+        }
+        
+        /* Theme toggle styles */
+        .theme-toggle {
+            background: transparent;
+            border: 2px solid var(--header-text);
+            color: var(--header-text);
+            border-radius: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-left: 15px;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .theme-toggle .icon {
+            margin-right: 5px;
+            font-size: 1.1em;
+        }
+        
+        .theme-container {
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -146,6 +202,11 @@
         <a href="#projects">Projects</a>
         <a href="#about-me">About Me</a>
         <a href="#contact">Contact</a>
+        <div class="theme-container">
+            <button id="themeToggle" class="theme-toggle">
+                <span class="icon">☀️</span> Light
+            </button>
+        </div>
     </nav>
     <main class="main-content">
         <section id="projects">
@@ -282,6 +343,40 @@
       setTimeout(() => {
         scrollPrompt.style.display = 'none';
       }, 500);
+    }
+  });
+
+  // Theme toggle functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    
+    // Check for saved theme preference or use preferred color scheme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateToggleButton(savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      updateToggleButton('dark');
+    }
+    
+    // Toggle theme when button is clicked
+    themeToggle.addEventListener('click', function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      updateToggleButton(newTheme);
+    });
+    
+    function updateToggleButton(theme) {
+      if (theme === 'dark') {
+        themeToggle.innerHTML = '<span class="icon">🌙</span> Dark';
+      } else {
+        themeToggle.innerHTML = '<span class="icon">☀️</span> Light';
+      }
     }
   });
 </script>
