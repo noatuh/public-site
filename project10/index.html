@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Function Plotter - Wireframe Color</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; /* Darker background */ font-family: Arial, sans-serif; }
+        canvas { display: block; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            z-index: 100;
+        }
+        #controls label { margin-right: 5px; }
+        #controls input[type="text"] { width: 250px; margin-right: 5px; padding: 5px; border-radius: 3px; border: 1px solid #555; background-color: #333; color: white; }
+        #controls button { padding: 5px 10px; border-radius: 3px; border: none; background-color: #0077ff; color: white; cursor: pointer; }
+        #controls button:hover { background-color: #0055cc; }
+        #errorMessage { color: #ff4444; margin-top: 5px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="equationInput">z = f(x, y) =</label>
+        <input type="text" id="equationInput" value="sin(sqrt(x^2+y^2))/sqrt(x^2+y^2) * 5"> <button id="plotButton">Plot</button>
+        <div id="errorMessage"></div>
+    </div>
+    <div id="container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
+
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.163.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        let scene, camera, renderer, mesh, controls;
+        let compiledFunction = null;
+
+        const equationInput = document.getElementById('equationInput');
+        const plotButton = document.getElementById('plotButton');
+        const errorMessageDiv = document.getElementById('errorMessage');
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111111); // Darker background
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            // Adjust camera position for better initial view of wireframe
+            camera.position.set(8, 8, 12);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('container').appendChild(renderer.domElement);
+
+            // No lighting needed for MeshBasicMaterial wireframe
+            // const ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
+            // scene.add(ambientLight);
+            // const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            // directionalLight.position.set(1, 1, 0.5).normalize();
+            // scene.add(directionalLight);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            // Optional: Set clear background for better wireframe visibility if needed elsewhere
+            // renderer.setClearColor(0x000000, 0); // Make canvas background transparent if needed
+
+            plotButton.addEventListener('click', updateGraph);
+             equationInput.addEventListener('keyup', (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    updateGraph();
+                }
+            });
+            window.addEventListener('resize', onWindowResize, false);
+
+            updateGraph();
+            animate();
+        }
+
+        function parseAndCompileEquation() {
+            const equationString = equationInput.value;
+            errorMessageDiv.textContent = '';
+            try {
+                compiledFunction = math.compile(equationString);
+                return true;
+            } catch (error) {
+                console.error("Equation parsing error:", error);
+                errorMessageDiv.textContent = `Error: ${error.message}`;
+                compiledFunction = null;
+                return false;
+            }
+        }
+
+        function updateGraph() {
+            if (!parseAndCompileEquation()) {
+                return;
+            }
+
+            if (mesh) {
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+                if(mesh.material.dispose) mesh.material.dispose(); // Basic material might not have dispose
+                mesh = null;
+            }
+
+            const xMin = -10, xMax = 10;
+            const yMin = -10, yMax = 10;
+            const resolution = 60;
+
+            const vertices = [];
+            const indices = [];
+            const stepX = (xMax - xMin) / resolution;
+            const stepY = (yMax - yMin) / resolution;
+
+            let minZ = Infinity;
+            let maxZ = -Infinity;
+
+            // --- Generate Vertices and find Min/Max Z ---
+            for (let i = 0; i <= resolution; i++) {
+                for (let j = 0; j <= resolution; j++) {
+                    const x = xMin + j * stepX;
+                    const y = yMin + i * stepY;
+                    let z = 0;
+                    const scope = { x: x, y: y };
+                    try {
+                        z = compiledFunction.evaluate(scope);
+                        if (typeof z !== 'number' || !isFinite(z)) {
+                           z = 0; // Default bad values
+                        }
+                    } catch (error) {
+                        console.error(`Evaluation error at x=${x}, y=${y}:`, error);
+                        errorMessageDiv.textContent = `Eval error near (${x.toFixed(1)}, ${y.toFixed(1)})`;
+                        z = 0;
+                    }
+                    vertices.push(x, y, z);
+
+                    // Track min/max Z values
+                    if (z < minZ) minZ = z;
+                    if (z > maxZ) maxZ = z;
+                }
+            }
+
+            // --- Generate Colors based on Z ---
+            const colors = [];
+            const rangeZ = maxZ - minZ;
+            const hasRange = rangeZ > 1e-6; // Check if range is significant enough
+
+            for (let k = 0; k < vertices.length; k += 3) {
+                const z = vertices[k + 2]; // Get the Z component
+                let t = 0.5; // Default to mid-color (yellowish) if no range
+
+                if (hasRange) {
+                    t = (z - minZ) / rangeZ; // Normalize Z value (0 to 1)
+                }
+
+                // Clamp t just in case of floating point issues
+                 t = Math.max(0, Math.min(1, t));
+
+                // Interpolate between green (0,1,0) and red (1,0,0)
+                const r = t;
+                const g = 1 - t;
+                const b = 0;
+
+                colors.push(r, g, b);
+            }
+
+            // --- Generate faces (indices) --- (Same as before)
+            for (let i = 0; i < resolution; i++) {
+                for (let j = 0; j < resolution; j++) {
+                    const a = i * (resolution + 1) + j;
+                    const b = a + 1;
+                    const c = (i + 1) * (resolution + 1) + j;
+                    const d = c + 1;
+                    indices.push(a, c, b);
+                    indices.push(b, c, d);
+                }
+            }
+
+            // --- Create Geometry ---
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            // *** Add the color attribute ***
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setIndex(indices);
+
+            // Normals are not strictly required for wireframe basic material, but good practice
+            try {
+                 geometry.computeVertexNormals();
+            } catch(error) {
+                 console.error("Error computing normals:", error);
+                 errorMessageDiv.textContent = `Geom error. Check function.`;
+                 return;
+            }
+
+            // --- Create Material (Wireframe + Vertex Colors) ---
+            const material = new THREE.MeshBasicMaterial({
+                vertexColors: true, // *** Use vertex colors ***
+                wireframe: true    // *** Display as wireframe ***
+            });
+
+            // --- Create Mesh ---
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+        }
+
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // --- Initialize ---
+        init();
+
+    </script>
+</body>
+</html>
