@@ -9,7 +9,7 @@
         canvas { display: block; }
         #controls {
             position: absolute;
-            top: 10px;
+            top: 60px; /* Increased to make room for the navigation bar */
             left: 10px;
             background-color: rgba(0,0,0,0.7);
             padding: 10px;
@@ -22,9 +22,44 @@
         #controls button { padding: 5px 10px; border-radius: 3px; border: none; background-color: #0077ff; color: white; cursor: pointer; }
         #controls button:hover { background-color: #0055cc; }
         #errorMessage { color: #ff4444; margin-top: 5px; font-size: 0.9em; }
+        
+        /* Navigation bar styles */
+        #nav-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1000;
+        }
+        #nav-header a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        #nav-header a:hover {
+            background-color: #0077ff;
+        }
+        #nav-header a.active {
+            background-color: #0055cc;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <!-- New navigation header -->
+    <div id="nav-header">
+        <a href="index.html" class="active">3D Function Plotter</a>
+        <a href="graphing.html">2D Graphing Calculator</a>
+        <a href="jscalc.html">Scientific Calculator</a>
+    </div>
+
     <div id="controls">
         <label for="equationInput">z = f(x, y) =</label>
         <input type="text" id="equationInput" value="sin(sqrt(x^2+y^2))/sqrt(x^2+y^2) * 5"> <button id="plotButton">Plot</button>

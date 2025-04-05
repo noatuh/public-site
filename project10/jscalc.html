@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        body { 
+            margin: 0; 
+            background-color: #111; 
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        
+        /* Navigation bar styles */
+        #nav-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1000;
+        }
+        #nav-header a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        #nav-header a:hover {
+            background-color: #0077ff;
+        }
+        #nav-header a.active {
+            background-color: #0055cc;
+            font-weight: bold;
+        }
+        
+        /* Calculator styles */
+        .calculator {
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 360px;
+            margin-top: 60px; /* Space for the navbar */
+            overflow: hidden;
+        }
+        
+        .display {
+            background-color: #222;
+            padding: 20px;
+            text-align: right;
+            position: relative;
+        }
+        
+        .previous-operand {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            min-height: 24px;
+            margin-bottom: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .current-operand {
+            color: white;
+            font-size: 32px;
+            min-height: 48px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            background-color: #444;
+        }
+        
+        button {
+            border: none;
+            outline: none;
+            padding: 20px 0;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        .number, .decimal {
+            background-color: #333;
+            color: white;
+        }
+        
+        .number:hover, .decimal:hover {
+            background-color: #444;
+        }
+        
+        .operator {
+            background-color: #0077ff;
+            color: white;
+        }
+        
+        .operator:hover {
+            background-color: #0055cc;
+        }
+        
+        .function {
+            background-color: #222;
+            color: white;
+        }
+        
+        .function:hover {
+            background-color: #333;
+        }
+        
+        .equals {
+            background-color: #0077ff;
+            color: white;
+            grid-column: span 2;
+        }
+        
+        .equals:hover {
+            background-color: #0055cc;
+        }
+        
+        .clear, .delete {
+            background-color: #aa3333;
+            color: white;
+        }
+        
+        .clear:hover, .delete:hover {
+            background-color: #cc0000;
+        }
+        
+        /* Memory indicators */
+        .memory-indicator {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 12px;
+            color: #0077ff;
+        }
+        
+        /* Additional styles for small screens */
+        @media (max-width: 380px) {
+            .calculator {
+                width: 100%;
+                border-radius: 0;
+            }
+            
+            button {
+                padding: 15px 0;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation header -->
+    <div id="nav-header">
+        <a href="index.html">3D Function Plotter</a>
+        <a href="graphing.html">2D Graphing Calculator</a>
+        <a href="jscalc.html" class="active">Scientific Calculator</a>
+    </div>
+
+    <div class="calculator">
+        <div class="display">
+            <div class="memory-indicator" id="memory-indicator"></div>
+            <div class="previous-operand" id="previous-operand"></div>
+            <div class="current-operand" id="current-operand">0</div>
+        </div>
+        
+        <div class="buttons">
+            <!-- Row 1: Advanced functions -->
+            <button class="function" data-function="sin">sin</button>
+            <button class="function" data-function="cos">cos</button>
+            <button class="function" data-function="tan">tan</button>
+            <button class="function" data-function="log">log</button>
+            <button class="function" data-function="ln">ln</button>
+            
+            <!-- Row 2: More functions -->
+            <button class="function" data-function="asin">sin⁻¹</button>
+            <button class="function" data-function="acos">cos⁻¹</button>
+            <button class="function" data-function="atan">tan⁻¹</button>
+            <button class="function" data-function="sqrt">√</button>
+            <button class="function" data-function="power">x^y</button>
+            
+            <!-- Row 3: Memory and others -->
+            <button class="function" data-memory="mc">MC</button>
+            <button class="function" data-memory="mr">MR</button>
+            <button class="function" data-memory="m+">M+</button>
+            <button class="function" data-memory="m-">M-</button>
+            <button class="function" data-function="pi">π</button>
+            
+            <!-- Row 4: First row of main calculator -->
+            <button class="clear" data-all-clear>AC</button>
+            <button class="delete" data-delete>DEL</button>
+            <button class="function" data-function="percent">%</button>
+            <button class="function" data-function="factorial">x!</button>
+            <button class="operator" data-operator="÷">÷</button>
+            
+            <!-- Row 5 -->
+            <button class="number" data-number="7">7</button>
+            <button class="number" data-number="8">8</button>
+            <button class="number" data-number="9">9</button>
+            <button class="function" data-function="reciprocal">1/x</button>
+            <button class="operator" data-operator="×">×</button>
+            
+            <!-- Row 6 -->
+            <button class="number" data-number="4">4</button>
+            <button class="number" data-number="5">5</button>
+            <button class="number" data-number="6">6</button>
+            <button class="function" data-function="square">x²</button>
+            <button class="operator" data-operator="-">-</button>
+            
+            <!-- Row 7 -->
+            <button class="number" data-number="1">1</button>
+            <button class="number" data-number="2">2</button>
+            <button class="number" data-number="3">3</button>
+            <button class="function" data-function="cube">x³</button>
+            <button class="operator" data-operator="+">+</button>
+            
+            <!-- Row 8 -->
+            <button class="function" data-function="negate">±</button>
+            <button class="number" data-number="0">0</button>
+            <button class="decimal" data-decimal>.</button>
+            <button class="equals" data-equals>=</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
+    
+    <script>
+        class Calculator {
+            constructor(previousOperandElement, currentOperandElement, memoryIndicatorElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.memoryIndicatorElement = memoryIndicatorElement;
+                this.clear();
+                this.memory = 0;
+                this.updateMemoryIndicator();
+            }
+            
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.readyForNewInput = false;
+                this.lastResult = null;
+            }
+            
+            delete() {
+                if (this.readyForNewInput) {
+                    this.currentOperand = '0';
+                    this.readyForNewInput = false;
+                    return;
+                }
+                
+                if (this.currentOperand === '0') return;
+                
+                if (this.currentOperand.length === 1) {
+                    this.currentOperand = '0';
+                } else {
+                    this.currentOperand = this.currentOperand.slice(0, -1);
+                }
+            }
+            
+            appendNumber(number) {
+                if (this.readyForNewInput) {
+                    this.currentOperand = number.toString();
+                    this.readyForNewInput = false;
+                    return;
+                }
+                
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                
+                if (this.currentOperand === '0' && number !== '.') {
+                    this.currentOperand = number.toString();
+                } else {
+                    this.currentOperand += number.toString();
+                }
+            }
+            
+            chooseOperation(operation) {
+                if (this.currentOperand === '') return;
+                
+                if (this.previousOperand !== '') {
+                    this.calculate();
+                }
+                
+                this.operation = operation;
+                this.previousOperand = `${this.currentOperand} ${operation}`;
+                this.readyForNewInput = true;
+            }
+            
+            executeFunction(func) {
+                const current = parseFloat(this.currentOperand);
+                let result;
+                
+                try {
+                    switch(func) {
+                        case 'sin':
+                            result = Math.sin(current * Math.PI / 180); // Degrees
+                            break;
+                        case 'cos':
+                            result = Math.cos(current * Math.PI / 180);
+                            break;
+                        case 'tan':
+                            result = Math.tan(current * Math.PI / 180);
+                            break;
+                        case 'asin':
+                            result = Math.asin(current) * 180 / Math.PI;
+                            break;
+                        case 'acos':
+                            result = Math.acos(current) * 180 / Math.PI;
+                            break;
+                        case 'atan':
+                            result = Math.atan(current) * 180 / Math.PI;
+                            break;
+                        case 'log':
+                            result = Math.log10(current);
+                            break;
+                        case 'ln':
+                            result = Math.log(current);
+                            break;
+                        case 'sqrt':
+                            result = Math.sqrt(current);
+                            break;
+                        case 'square':
+                            result = current * current;
+                            break;
+                        case 'cube':
+                            result = current * current * current;
+                            break;
+                        case 'reciprocal':
+                            result = 1 / current;
+                            break;
+                        case 'percent':
+                            if (this.previousOperand !== '') {
+                                const prevNum = parseFloat(this.previousOperand.split(' ')[0]);
+                                result = prevNum * (current / 100);
+                            } else {
+                                result = current / 100;
+                            }
+                            break;
+                        case 'factorial':
+                            result = this.factorial(current);
+                            break;
+                        case 'negate':
+                            result = -current;
+                            break;
+                        case 'pi':
+                            result = Math.PI;
+                            break;
+                        case 'power':
+                            if (this.previousOperand !== '') {
+                                const base = parseFloat(this.previousOperand.split(' ')[0]);
+                                result = Math.pow(base, current);
+                                this.previousOperand = `${base} ^ ${current} =`;
+                            } else {
+                                this.previousOperand = `${current} ^`;
+                                this.operation = 'power';
+                                this.readyForNewInput = true;
+                                return;
+                            }
+                            break;
+                        default:
+                            return;
+                    }
+                    
+                    // Format the result
+                    if (isNaN(result) || !isFinite(result)) {
+                        this.currentOperand = 'Error';
+                    } else {
+                        // Convert to string with appropriate precision
+                        this.currentOperand = this.formatNumber(result);
+                    }
+                    
+                    this.operation = undefined;
+                    this.readyForNewInput = true;
+                    this.lastResult = result;
+                    
+                    if (func !== 'power' || this.previousOperand.includes('=')) {
+                        this.previousOperand = `${func}(${current}) =`;
+                    }
+                    
+                } catch (error) {
+                    this.currentOperand = 'Error';
+                    this.readyForNewInput = true;
+                }
+            }
+            
+            factorial(n) {
+                // Check if n is a non-negative integer
+                if (n < 0 || !Number.isInteger(n)) {
+                    throw new Error('Factorial only defined for non-negative integers');
+                }
+                
+                if (n === 0 || n === 1) return 1;
+                
+                let result = 1;
+                for (let i = 2; i <= n; i++) {
+                    result *= i;
+                    if (!isFinite(result)) break; // Avoid overflow
+                }
+                
+                return result;
+            }
+            
+            handleMemory(action) {
+                const current = parseFloat(this.currentOperand);
+                
+                switch(action) {
+                    case 'mc': // Memory Clear
+                        this.memory = 0;
+                        break;
+                    case 'mr': // Memory Recall
+                        this.currentOperand = this.formatNumber(this.memory);
+                        this.readyForNewInput = true;
+                        break;
+                    case 'm+': // Memory Add
+                        this.memory += current;
+                        this.readyForNewInput = true;
+                        break;
+                    case 'm-': // Memory Subtract
+                        this.memory -= current;
+                        this.readyForNewInput = true;
+                        break;
+                }
+                
+                this.updateMemoryIndicator();
+            }
+            
+            updateMemoryIndicator() {
+                if (this.memory !== 0) {
+                    this.memoryIndicatorElement.textContent = 'M';
+                } else {
+                    this.memoryIndicatorElement.textContent = '';
+                }
+            }
+            
+            calculate() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                try {
+                    switch (this.operation) {
+                        case '+':
+                            computation = prev + current;
+                            break;
+                        case '-':
+                            computation = prev - current;
+                            break;
+                        case '×':
+                            computation = prev * current;
+                            break;
+                        case '÷':
+                            if (current === 0) throw new Error('Division by zero');
+                            computation = prev / current;
+                            break;
+                        case 'power':
+                            computation = Math.pow(prev, current);
+                            break;
+                        default:
+                            return;
+                    }
+                    
+                    if (isNaN(computation) || !isFinite(computation)) {
+                        this.currentOperand = 'Error';
+                    } else {
+                        this.currentOperand = this.formatNumber(computation);
+                    }
+                    
+                    this.lastResult = computation;
+                    this.operation = undefined;
+                    this.previousOperand = `${prev} ${this.operation} ${current} =`;
+                    this.readyForNewInput = true;
+                } catch (error) {
+                    this.currentOperand = 'Error';
+                    this.readyForNewInput = true;
+                }
+            }
+            
+            formatNumber(number) {
+                // Convert to string with appropriate precision
+                if (Math.abs(number) < 1e-10) return '0'; // Handle very small numbers near zero
+                
+                const stringNumber = number.toString();
+                
+                // Check if it's already in scientific notation
+                if (stringNumber.includes('e')) return stringNumber;
+                
+                // For very large or very small numbers, use scientific notation
+                if (Math.abs(number) > 1e10 || (Math.abs(number) < 1e-6 && number !== 0)) {
+                    return number.toExponential(6);
+                }
+                
+                // For normal numbers with decimal points
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                
+                let integerDisplay;
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 });
+                }
+                
+                if (decimalDigits != null) {
+                    // Trim trailing zeros
+                    let trimmedDecimal = decimalDigits;
+                    while (trimmedDecimal.length > 0 && trimmedDecimal.endsWith('0')) {
+                        trimmedDecimal = trimmedDecimal.slice(0, -1);
+                    }
+                    
+                    if (trimmedDecimal.length > 0) {
+                        // Limit decimal places to 10 for display
+                        if (trimmedDecimal.length > 10) {
+                            trimmedDecimal = trimmedDecimal.substring(0, 10);
+                        }
+                        return `${integerDisplay}.${trimmedDecimal}`;
+                    }
+                }
+                
+                return integerDisplay;
+            }
+            
+            updateDisplay() {
+                this.currentOperandElement.textContent = this.currentOperand;
+                this.previousOperandElement.textContent = this.previousOperand;
+            }
+        }
+        
+        // DOM elements
+        const previousOperandElement = document.getElementById('previous-operand');
+        const currentOperandElement = document.getElementById('current-operand');
+        const memoryIndicatorElement = document.getElementById('memory-indicator');
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operatorButtons = document.querySelectorAll('[data-operator]');
+        const functionButtons = document.querySelectorAll('[data-function]');
+        const memoryButtons = document.querySelectorAll('[data-memory]');
+        const equalsButton = document.querySelector('[data-equals]');
+        const deleteButton = document.querySelector('[data-delete]');
+        const allClearButton = document.querySelector('[data-all-clear]');
+        const decimalButton = document.querySelector('[data-decimal]');
+        
+        // Initialize calculator
+        const calculator = new Calculator(previousOperandElement, currentOperandElement, memoryIndicatorElement);
+        
+        // Add event listeners
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.appendNumber(button.innerText);
+                calculator.updateDisplay();
+            });
+        });
+        
+        operatorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.chooseOperation(button.innerText);
+                calculator.updateDisplay();
+            });
+        });
+        
+        functionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.executeFunction(button.dataset.function);
+                calculator.updateDisplay();
+            });
+        });
+        
+        memoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.handleMemory(button.dataset.memory);
+                calculator.updateDisplay();
+            });
+        });
+        
+        equalsButton.addEventListener('click', () => {
+            calculator.calculate();
+            calculator.updateDisplay();
+        });
+        
+        allClearButton.addEventListener('click', () => {
+            calculator.clear();
+            calculator.updateDisplay();
+        });
+        
+        deleteButton.addEventListener('click', () => {
+            calculator.delete();
+            calculator.updateDisplay();
+        });
+        
+        decimalButton.addEventListener('click', () => {
+            calculator.appendNumber('.');
+            calculator.updateDisplay();
+        });
+        
+        // Keyboard support
+        document.addEventListener('keydown', event => {
+            // Numbers
+            if (/[0-9]/.test(event.key)) {
+                event.preventDefault();
+                calculator.appendNumber(event.key);
+                calculator.updateDisplay();
+            }
+            // Operators
+            else if (['+', '-'].includes(event.key)) {
+                event.preventDefault();
+                calculator.chooseOperation(event.key);
+                calculator.updateDisplay();
+            }
+            else if (event.key === '*') {
+                event.preventDefault();
+                calculator.chooseOperation('×');
+                calculator.updateDisplay();
+            }
+            else if (event.key === '/') {
+                event.preventDefault();
+                calculator.chooseOperation('÷');
+                calculator.updateDisplay();
+            }
+            // Decimal point
+            else if (event.key === '.') {
+                event.preventDefault();
+                calculator.appendNumber('.');
+                calculator.updateDisplay();
+            }
+            // Equal (Enter or =)
+            else if (event.key === '=' || event.key === 'Enter') {
+                event.preventDefault();
+                calculator.calculate();
+                calculator.updateDisplay();
+            }
+            // Delete (Backspace)
+            else if (event.key === 'Backspace') {
+                event.preventDefault();
+                calculator.delete();
+                calculator.updateDisplay();
+            }
+            // Clear (Escape)
+            else if (event.key === 'Escape') {
+                event.preventDefault();
+                calculator.clear();
+                calculator.updateDisplay();
+            }
+        });
+        
+        // Update display initially
+        calculator.updateDisplay();
+    </script>
+</body>
+</html>

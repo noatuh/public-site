@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Graphing Calculator</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; font-family: Arial, sans-serif; }
+        canvas { display: block; }
+        #controls {
+            position: absolute;
+            top: 60px; /* Increased to make room for the navigation bar */
+            left: 10px;
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            z-index: 100;
+        }
+        #controls label { margin-right: 5px; }
+        #controls input[type="text"] { width: 250px; margin-right: 5px; padding: 5px; border-radius: 3px; border: 1px solid #555; background-color: #333; color: white; }
+        #controls button { padding: 5px 10px; border-radius: 3px; border: none; background-color: #0077ff; color: white; cursor: pointer; }
+        #controls button:hover { background-color: #0055cc; }
+        #errorMessage { color: #ff4444; margin-top: 5px; font-size: 0.9em; }
+        
+        /* Range controls */
+        .range-controls {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .range-control {
+            display: flex;
+            align-items: center;
+        }
+        .range-control label {
+            margin-right: 5px;
+            width: 40px;
+        }
+        .range-control input {
+            width: 50px;
+            padding: 3px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+        }
+        
+        /* Function list */
+        #functionList {
+            margin-top: 10px;
+        }
+        .function-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .color-preview {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .remove-btn {
+            margin-left: 8px;
+            background-color: #aa3333;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+        .remove-btn:hover {
+            background-color: #cc0000;
+        }
+        
+        /* Navigation bar styles */
+        #nav-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1000;
+        }
+        #nav-header a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        #nav-header a:hover {
+            background-color: #0077ff;
+        }
+        #nav-header a.active {
+            background-color: #0055cc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation header -->
+    <div id="nav-header">
+        <a href="index.html">3D Function Plotter</a>
+        <a href="graphing.html" class="active">2D Graphing Calculator</a>
+        <a href="jscalc.html">Scientific Calculator</a>
+    </div>
+
+    <div id="controls">
+        <div>
+            <label for="equationInput">y = f(x) =</label>
+            <input type="text" id="equationInput" value="sin(x)"> 
+            <button id="addButton">Add Graph</button>
+        </div>
+        <div id="errorMessage"></div>
+        
+        <div class="range-controls">
+            <div class="range-control">
+                <label for="xMin">xMin:</label>
+                <input type="text" id="xMin" value="-10">
+            </div>
+            <div class="range-control">
+                <label for="xMax">xMax:</label>
+                <input type="text" id="xMax" value="10">
+            </div>
+            <div class="range-control">
+                <label for="yMin">yMin:</label>
+                <input type="text" id="yMin" value="-10">
+            </div>
+            <div class="range-control">
+                <label for="yMax">yMax:</label>
+                <input type="text" id="yMax" value="10">
+            </div>
+            <button id="updateRangeButton">Update Range</button>
+        </div>
+        
+        <div id="functionList">
+            <!-- Function items will be added here dynamically -->
+        </div>
+    </div>
+    <canvas id="graphCanvas"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
+    
+    <script>
+        // Main variables
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        const equationInput = document.getElementById('equationInput');
+        const addButton = document.getElementById('addButton');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        const updateRangeButton = document.getElementById('updateRangeButton');
+        const functionListDiv = document.getElementById('functionList');
+        
+        // Range inputs
+        const xMinInput = document.getElementById('xMin');
+        const xMaxInput = document.getElementById('xMax');
+        const yMinInput = document.getElementById('yMin');
+        const yMaxInput = document.getElementById('yMax');
+        
+        // Graph state
+        let xMin = -10, xMax = 10;
+        let yMin = -10, yMax = 10;
+        let functions = [];
+        
+        // Available colors for graphs
+        const colors = [
+            '#FF4136', // Red
+            '#2ECC40', // Green
+            '#0074D9', // Blue
+            '#FFDC00', // Yellow
+            '#B10DC9', // Purple
+            '#FF851B', // Orange
+            '#39CCCC', // Teal
+            '#F012BE', // Magenta
+            '#01FF70', // Lime
+            '#AAAAAA'  // Gray
+        ];
+        
+        // Initialize the canvas
+        function initCanvas() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Add event listeners
+            addButton.addEventListener('click', addFunction);
+            updateRangeButton.addEventListener('click', updateRangeAndRedraw);
+            equationInput.addEventListener('keyup', event => {
+                if (event.key === 'Enter') addFunction();
+            });
+            
+            // Draw initial state
+            drawGraph();
+        }
+        
+        // Resize canvas to fill window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawGraph();
+        }
+        
+        // Parse and compile a math function
+        function parseFunction(equation) {
+            try {
+                return math.compile(equation);
+            } catch (error) {
+                errorMessageDiv.textContent = `Error: ${error.message}`;
+                console.error("Equation parsing error:", error);
+                return null;
+            }
+        }
+        
+        // Add a new function to the graph
+        function addFunction() {
+            const equation = equationInput.value.trim();
+            if (!equation) {
+                errorMessageDiv.textContent = "Please enter an equation";
+                return;
+            }
+            
+            errorMessageDiv.textContent = '';
+            const compiledFunction = parseFunction(equation);
+            if (!compiledFunction) return;
+            
+            // Create a function object
+            const colorIndex = functions.length % colors.length;
+            const func = {
+                equation: equation,
+                compiledFunction: compiledFunction,
+                color: colors[colorIndex]
+            };
+            
+            functions.push(func);
+            equationInput.value = '';
+            
+            // Add to function list UI
+            addFunctionToList(func, functions.length - 1);
+            
+            // Redraw the graph
+            drawGraph();
+        }
+        
+        // Add a function to the UI list
+        function addFunctionToList(func, index) {
+            const item = document.createElement('div');
+            item.className = 'function-item';
+            
+            const colorPreview = document.createElement('div');
+            colorPreview.className = 'color-preview';
+            colorPreview.style.backgroundColor = func.color;
+            
+            const equation = document.createElement('span');
+            equation.textContent = `y = ${func.equation}`;
+            
+            const removeButton = document.createElement('button');
+            removeButton.className = 'remove-btn';
+            removeButton.textContent = 'X';
+            removeButton.onclick = () => {
+                functions.splice(index, 1);
+                updateFunctionList();
+                drawGraph();
+            };
+            
+            item.appendChild(colorPreview);
+            item.appendChild(equation);
+            item.appendChild(removeButton);
+            functionListDiv.appendChild(item);
+        }
+        
+        // Update the function list UI
+        function updateFunctionList() {
+            functionListDiv.innerHTML = '';
+            functions.forEach((func, index) => {
+                addFunctionToList(func, index);
+            });
+        }
+        
+        // Update the range values and redraw
+        function updateRangeAndRedraw() {
+            try {
+                xMin = parseFloat(xMinInput.value);
+                xMax = parseFloat(xMaxInput.value);
+                yMin = parseFloat(yMinInput.value);
+                yMax = parseFloat(yMaxInput.value);
+                
+                if (isNaN(xMin) || isNaN(xMax) || isNaN(yMin) || isNaN(yMax)) {
+                    throw new Error("Range values must be numbers");
+                }
+                
+                if (xMin >= xMax || yMin >= yMax) {
+                    throw new Error("Min values must be less than max values");
+                }
+                
+                errorMessageDiv.textContent = '';
+                drawGraph();
+            } catch (error) {
+                errorMessageDiv.textContent = `Range error: ${error.message}`;
+            }
+        }
+        
+        // Convert from math coordinates to canvas coordinates
+        function toCanvasX(x) {
+            return (x - xMin) / (xMax - xMin) * canvas.width;
+        }
+        
+        function toCanvasY(y) {
+            return canvas.height - (y - yMin) / (yMax - yMin) * canvas.height;
+        }
+        
+        // Draw the coordinate grid
+        function drawGrid() {
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 1;
+            
+            // Draw x-axis if visible
+            if (yMin <= 0 && yMax >= 0) {
+                const y0 = toCanvasY(0);
+                ctx.beginPath();
+                ctx.moveTo(0, y0);
+                ctx.lineTo(canvas.width, y0);
+                ctx.stroke();
+            }
+            
+            // Draw y-axis if visible
+            if (xMin <= 0 && xMax >= 0) {
+                const x0 = toCanvasX(0);
+                ctx.beginPath();
+                ctx.moveTo(x0, 0);
+                ctx.lineTo(x0, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Draw grid lines
+            ctx.strokeStyle = '#222222';
+            
+            // X grid lines
+            const xStep = calculateGridStep(xMax - xMin);
+            const xStart = Math.ceil(xMin / xStep) * xStep;
+            for (let x = xStart; x <= xMax; x += xStep) {
+                const canvasX = toCanvasX(x);
+                ctx.beginPath();
+                ctx.moveTo(canvasX, 0);
+                ctx.lineTo(canvasX, canvas.height);
+                ctx.stroke();
+                
+                // Draw x label
+                if (Math.abs(x) > 1e-10) { // Avoid drawing "0" if we have a y-axis
+                    ctx.fillStyle = '#666666';
+                    ctx.fillText(x.toFixed(1), canvasX + 2, toCanvasY(0) + 12);
+                }
+            }
+            
+            // Y grid lines
+            const yStep = calculateGridStep(yMax - yMin);
+            const yStart = Math.ceil(yMin / yStep) * yStep;
+            for (let y = yStart; y <= yMax; y += yStep) {
+                const canvasY = toCanvasY(y);
+                ctx.beginPath();
+                ctx.moveTo(0, canvasY);
+                ctx.lineTo(canvas.width, canvasY);
+                ctx.stroke();
+                
+                // Draw y label
+                if (Math.abs(y) > 1e-10) { // Avoid drawing "0" if we have an x-axis
+                    ctx.fillStyle = '#666666';
+                    ctx.fillText(y.toFixed(1), toCanvasX(0) + 2, canvasY - 2);
+                }
+            }
+        }
+        
+        // Calculate an appropriate step size for grid lines
+        function calculateGridStep(range) {
+            const rough = range / 10; // Aim for about 10 grid lines
+            const magnitude = Math.pow(10, Math.floor(Math.log10(rough)));
+            
+            if (rough / magnitude < 2) return magnitude / 2;
+            if (rough / magnitude < 5) return magnitude;
+            return magnitude * 2;
+        }
+        
+        // Plot a function
+        function plotFunction(func) {
+            const resolution = canvas.width;
+            const step = (xMax - xMin) / resolution;
+            
+            ctx.strokeStyle = func.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            let lastY = null;
+            let firstPoint = true;
+            
+            for (let i = 0; i <= resolution; i++) {
+                const x = xMin + i * step;
+                let y;
+                
+                try {
+                    y = func.compiledFunction.evaluate({ x });
+                    
+                    // Check for valid number
+                    if (!isFinite(y) || isNaN(y)) {
+                        lastY = null;
+                        continue;
+                    }
+                    
+                    // Skip if out of y-range (with some margin)
+                    if (y < yMin - 100 || y > yMax + 100) {
+                        lastY = null;
+                        continue;
+                    }
+                    
+                    // Detect large jumps in y-value (asymptotes)
+                    if (lastY !== null && Math.abs(y - lastY) > (yMax - yMin) / 2) {
+                        lastY = y;
+                        firstPoint = true;
+                        continue;
+                    }
+                    
+                    const canvasX = toCanvasX(x);
+                    const canvasY = toCanvasY(y);
+                    
+                    if (firstPoint) {
+                        ctx.moveTo(canvasX, canvasY);
+                        firstPoint = false;
+                    } else {
+                        ctx.lineTo(canvasX, canvasY);
+                    }
+                    
+                    lastY = y;
+                } catch (e) {
+                    lastY = null;
+                    continue;
+                }
+            }
+            
+            ctx.stroke();
+        }
+        
+        // Main drawing function
+        function drawGraph() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw coordinate grid
+            drawGrid();
+            
+            // Draw each function
+            functions.forEach(func => {
+                plotFunction(func);
+            });
+        }
+        
+        // Initialize
+        initCanvas();
+    </script>
+</body>
+</html>
