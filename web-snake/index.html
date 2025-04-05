@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: navy;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: white;
+      margin: 10px;
+      transition: color 0.5s ease, text-shadow 0.5s ease; /* Smooth transition for color changes */
+    }
+    .instructions {
+      color: #AAA;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px;
+    }
+    #score, label {
+      color: white;
+    }
+    #toggleGrid, #speedSlider {
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+    #speedSlider::-webkit-slider-thumb {
+      pointer-events: none;
+    }
+    #speedSlider::-moz-range-thumb {
+      pointer-events: none;
+    }
+    canvas {
+      background-color: black;
+      display: block;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Popup styles */
+    #startPopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 128, 0.85);
+      color: white;
+      padding: 20px 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+      font-size: 24px;
+      z-index: 100;
+      text-align: center;
+      transition: opacity 1s ease-out;
+      pointer-events: none; /* Let clicks pass through */
+    }
+  </style>
+</head>
+<body>
+  <h1>Snake Game</h1>
+  <div id="controls">
+    <div id="score">Score: 0</div>
+    <button id="toggleGrid">Toggle Grid</button>
+    <label for="speedSlider">Speed:</label>
+    <input type="range" id="speedSlider" min="2" max="20" value="10" step="1">
+  </div>
+  <canvas id="gameCanvas" width="800" height="800"></canvas>
+  
+  <!-- Popup message -->
+  <div id="startPopup">Press the arrow keys to begin</div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+    const toggleGridBtn = document.getElementById('toggleGrid');
+    const speedSlider = document.getElementById('speedSlider');
+    const gameTitle = document.querySelector('h1'); // Get the title element
+    const startPopup = document.getElementById('startPopup'); // Get the popup element
+
+    const gridSize = 20;
+    const tileCount = canvas.width / gridSize;
+
+    let snake = [{ x: 10, y: 10 }];
+    let food = { x: 15, y: 15 };
+    let dx = 0;
+    let dy = 0;
+    let score = 0;
+    let showGrid = false;
+    let speed = 22 - parseInt(speedSlider.value); // Reverse direction
+    let frame = 0;
+    let gameRunning = true;
+    let trail = []; // Array to store the trail positions
+    const maxTrailLength = 10; // Maximum length of the trail
+    let inTronMode = false; // Track if we're in Tron mode
+    let gameStarted = false; // Track if game has been started by user
+
+    speedSlider.addEventListener('input', () => {
+      speed = 22 - parseInt(speedSlider.value); // Reverse direction
+      
+      // Check if we should enter or exit Tron mode
+      if (speed < 7 && !inTronMode) {
+        // Enter Tron mode
+        gameTitle.textContent = "TRON MODE!";
+        gameTitle.style.color = "#9370DB"; // Purple color
+        inTronMode = true;
+      } else if (speed >= 7 && inTronMode) {
+        // Exit Tron mode
+        gameTitle.textContent = "Snake Game";
+        gameTitle.style.color = "white";
+        inTronMode = false;
+      }
+    });
+
+    speedSlider.addEventListener('keydown', e => {
+      e.preventDefault(); // Prevent arrow keys from adjusting the slider
+    });
+
+    toggleGridBtn.addEventListener('click', () => {
+      showGrid = !showGrid;
+    });
+
+    function drawTile(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2);
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = '#222';
+      for (let x = 0; x < tileCount; x++) {
+        for (let y = 0; y < tileCount; y++) {
+          ctx.strokeRect(x * gridSize, y * gridSize, gridSize, gridSize);
+        }
+      }
+    }
+
+    function updateScore() {
+      scoreDisplay.textContent = `Score: ${score}`;
+    }
+
+    function gameLoop() {
+      requestAnimationFrame(gameLoop);
+
+      if (++frame % speed !== 0) return;
+
+      // Check Tron mode status during gameplay
+      if (speed < 7 && !inTronMode) {
+        // Enter Tron mode
+        gameTitle.textContent = "TRON MODE!";
+        gameTitle.style.color = "#9370DB"; // Purple color
+        inTronMode = true;
+      } else if (speed >= 7 && inTronMode) {
+        // Exit Tron mode
+        gameTitle.textContent = "Snake Game";
+        gameTitle.style.color = "white";
+        inTronMode = false;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (showGrid) drawGrid();
+
+      let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+      // Handle borders - wrap around when speed is high (below 7 instead of 5)
+      if (speed < 7) {
+        // Wrap around logic
+        if (head.x < 0) head.x = tileCount - 1;
+        if (head.x >= tileCount) head.x = 0;
+        if (head.y < 0) head.y = tileCount - 1;
+        if (head.y >= tileCount) head.y = 0;
+        
+        // Only check for collisions with the snake body, not walls
+        if (snake.some(s => s.x === head.x && s.y === head.y)) {
+          snake = [{ x: 10, y: 10 }];
+          dx = dy = 0;
+          score = 0;
+          updateScore();
+          trail = []; // Clear the trail on game reset
+          food = {
+            x: Math.floor(Math.random() * (tileCount - 2)) + 1,
+            y: Math.floor(Math.random() * (tileCount - 2)) + 1
+          };
+          return;
+        }
+      } else {
+        // Normal border collision at slower speeds
+        if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount || snake.some(s => s.x === head.x && s.y === head.y)) {
+          snake = [{ x: 10, y: 10 }];
+          dx = dy = 0;
+          score = 0;
+          updateScore();
+          trail = []; // Clear the trail on game reset
+          food = {
+            x: Math.floor(Math.random() * (tileCount - 2)) + 1,
+            y: Math.floor(Math.random() * (tileCount - 2)) + 1
+          };
+          return;
+        }
+      }
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        food = { x: Math.floor(Math.random() * tileCount), y: Math.floor(Math.random() * tileCount) };
+        score++;
+        updateScore();
+      } else {
+        // Add the last snake part to the trail before removing it
+        if (snake.length > 1) {
+          trail.push({...snake[snake.length - 1]});
+          // Gradually increase trail length from speed 7 down to 3
+          // At speed 7: shorter trail
+          // At speed 3: longest trail
+          const speedFactor = Math.max(0, 7 - speed) / 4; // 0 at speed 7, 1 at speed 3 or lower
+          const trailLimit = Math.max(3, Math.min(maxTrailLength, Math.floor(3 + speedFactor * (maxTrailLength - 3))));
+          while (trail.length > trailLimit) {
+            trail.shift();
+          }
+        }
+        snake.pop();
+      }
+
+      // Draw the trail with fading opacity based on position in trail
+      // Start showing trail when speed is below 7 (instead of 5)
+      if (speed < 7) {
+        // Calculate how intense the trail should be based on speed
+        // At speed 7: barely visible
+        // At speed 3: fully visible
+        const intensityFactor = Math.max(0, 7 - speed) / 4; // 0 at speed 7, 1 at speed 3 or lower
+        
+        trail.forEach((part, index) => {
+          // Calculate opacity based on position in trail and speed
+          const baseOpacity = (index + 1) / trail.length; // Higher for newer trail segments
+          const finalOpacity = baseOpacity * 0.5 * intensityFactor; // Apply intensity scaling
+          
+          ctx.fillStyle = `rgba(0, 255, 0, ${finalOpacity})`;
+          ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
+        });
+      }
+
+      // Draw the snake
+      snake.forEach(part => drawTile(part.x, part.y, 'lime'));
+      drawTile(food.x, food.y, 'red');
+    }
+
+    document.addEventListener('keydown', e => {
+      const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key);
+      
+      if (isArrowKey && !gameStarted) {
+        // First arrow key press - fade out the popup
+        gameStarted = true;
+        fadeOutPopup();
+      }
+
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          if (dy === 0) { dx = 0; dy = -1; }
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          if (dy === 0) { dx = 0; dy = 1; }
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          if (dx === 0) { dx = -1; dy = 0; }
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          if (dx === 0) { dx = 1; dy = 0; }
+          break;
+      }
+    });
+
+    function fadeOutPopup() {
+      startPopup.style.opacity = '0';
+      setTimeout(() => {
+        startPopup.style.display = 'none';
+      }, 1000); // Remove from DOM after fade completes
+    }
+
+    updateScore();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
