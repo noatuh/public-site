@@ -169,6 +169,11 @@
         let yMin = -10, yMax = 10;
         let functions = [];
         
+        // Mouse interaction variables
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        
         // Available colors for graphs
         const colors = [
             '#FF4136', // Red
@@ -195,7 +200,101 @@
                 if (event.key === 'Enter') addFunction();
             });
             
+            // Add mouse event listeners for panning
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+            
+            // Add wheel event for zooming
+            canvas.addEventListener('wheel', handleWheel, { passive: false });
+            
             // Draw initial state
+            drawGraph();
+        }
+        
+        // Mouse event handlers for panning
+        function handleMouseDown(e) {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            canvas.style.cursor = 'grabbing';
+        }
+        
+        function handleMouseMove(e) {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - lastMouseX;
+            const deltaY = e.clientY - lastMouseY;
+            
+            // Convert pixel movement to coordinate space movement
+            const xRange = xMax - xMin;
+            const yRange = yMax - yMin;
+            
+            const xDelta = -deltaX * xRange / canvas.width;
+            const yDelta = deltaY * yRange / canvas.height;
+            
+            // Update ranges
+            xMin += xDelta;
+            xMax += xDelta;
+            yMin += yDelta;
+            yMax += yDelta;
+            
+            // Update input fields
+            xMinInput.value = xMin.toFixed(2);
+            xMaxInput.value = xMax.toFixed(2);
+            yMinInput.value = yMin.toFixed(2);
+            yMaxInput.value = yMax.toFixed(2);
+            
+            // Update mouse position
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            
+            // Redraw
+            drawGraph();
+        }
+        
+        function handleMouseUp() {
+            isDragging = false;
+            canvas.style.cursor = 'default';
+        }
+        
+        // Wheel event handler for zooming
+        function handleWheel(e) {
+            e.preventDefault();
+            
+            // Get mouse position in canvas
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Convert to graph coordinates
+            const graphX = xMin + (mouseX / canvas.width) * (xMax - xMin);
+            const graphY = yMax - (mouseY / canvas.height) * (yMax - yMin);
+            
+            // Zoom factor
+            const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+            
+            // Apply zoom centered on mouse position
+            const newXRange = (xMax - xMin) * zoomFactor;
+            const newYRange = (yMax - yMin) * zoomFactor;
+            
+            // Calculate new boundaries while keeping mouse position fixed
+            const mouseXRatio = (graphX - xMin) / (xMax - xMin);
+            const mouseYRatio = (graphY - yMin) / (yMax - yMin);
+            
+            xMin = graphX - mouseXRatio * newXRange;
+            xMax = xMin + newXRange;
+            yMin = graphY - mouseYRatio * newYRange;
+            yMax = yMin + newYRange;
+            
+            // Update input fields
+            xMinInput.value = xMin.toFixed(2);
+            xMaxInput.value = xMax.toFixed(2);
+            yMinInput.value = yMin.toFixed(2);
+            yMaxInput.value = yMax.toFixed(2);
+            
+            // Redraw
             drawGraph();
         }
         
