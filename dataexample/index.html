@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Intelligence Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .nav-button {
+            display: inline-block;
+            background-color: #ffffff;
+            color: #4a69bd;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.2s ease;
+        }
+        .nav-button:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>Company Performance Dashboard</h1>
+        <p>Overview of Key Business Metrics</p>
+        <a href="raw.html" class="nav-button">View Source Data</a>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="kpi-row">
+            <div class="kpi-card">
+                <h2>Total Revenue</h2>
+                <p id="kpi-revenue">$0</p>
+                <span>+5.2% vs last month</span>
+            </div>
+            <div class="kpi-card">
+                <h2>New Customers</h2>
+                <p id="kpi-customers">0</p>
+                <span>+12% vs last month</span>
+            </div>
+            <div class="kpi-card">
+                <h2>Avg. Order Value</h2>
+                <p id="kpi-aov">$0</p>
+                <span>-1.5% vs last month</span>
+            </div>
+            <div class="kpi-card">
+                <h2>Conversion Rate</h2>
+                <p id="kpi-conversion">0%</p>
+                <span>+0.8% vs last month</span>
+            </div>
+        </section>
+
+        <section class="chart-row">
+            <div class="chart-container">
+                <h2>Monthly Revenue Trend</h2>
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Sales by Product Category</h2>
+                <canvas id="productChart"></canvas>
+            </div>
+        </section>
+
+        <section class="chart-row">
+            <div class="chart-container large">
+                <h2>Sales Distribution by Region</h2>
+                <canvas id="regionChart"></canvas>
+            </div>
+            <div class="chart-container small">
+                <h2>Customer Acquisition Source</h2>
+                <canvas id="sourceChart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Dashboard Data</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #4a69bd;
+            border-bottom: 2px solid #dfe4ea;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #eef2f7;
+            font-weight: 600;
+            color: #4a69bd;
+        }
+        tr:nth-child(even) {
+            background-color: #f8faff;
+        }
+        tr:hover {
+            background-color: #e6eafc;
+        }
+        caption {
+            caption-side: bottom;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .nav-button {
+            display: inline-block;
+            background-color: #4a69bd;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 20px auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.2s ease;
+        }
+        .nav-button:hover {
+            background-color: #3a559d;
+        }
+        .button-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Source Data for Business Dashboard</h1>
+    <div class="button-container">
+        <a href="index.html" class="nav-button">Back to Dashboard</a>
+    </div>
+
+    <h2>Monthly Revenue</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Revenue (USD)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Jan</td><td>15000</td></tr>
+            <tr><td>Feb</td><td>17500</td></tr>
+            <tr><td>Mar</td><td>16000</td></tr>
+            <tr><td>Apr</td><td>19000</td></tr>
+            <tr><td>May</td><td>21000</td></tr>
+            <tr><td>Jun</td><td>20500</td></tr>
+            <tr><td>Jul</td><td>23000</td></tr>
+            <tr><td>Aug</td><td>24500</td></tr>
+            <tr><td>Sep</td><td>22000</td></tr>
+            <tr><td>Oct</td><td>25000</td></tr>
+            <tr><td>Nov</td><td>27000</td></tr>
+            <tr><td>Dec</td><td>28500</td></tr>
+        </tbody>
+        <caption>Data used for the Monthly Revenue Trend line chart.</caption>
+    </table>
+
+    <h2>Sales by Product Category</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Category</th>
+                <th>Total Sales (USD)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Electronics</td><td>35000</td></tr>
+            <tr><td>Clothing</td><td>28000</td></tr>
+            <tr><td>Home Goods</td><td>22000</td></tr>
+            <tr><td>Groceries</td><td>18000</td></tr>
+            <tr><td>Books</td><td>12000</td></tr>
+        </tbody>
+        <caption>Data used for the Sales by Product Category bar chart.</caption>
+    </table>
+
+    <h2>Sales Distribution by Region</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Region</th>
+                <th>Sales (USD)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>North</td><td>45000</td></tr>
+            <tr><td>South</td><td>30000</td></tr>
+            <tr><td>East</td><td>25000</td></tr>
+            <tr><td>West</td><td>38000</td></tr>
+            <tr><td>Central</td><td>15000</td></tr>
+        </tbody>
+        <caption>Data used for the Sales Distribution by Region bar chart.</caption>
+    </table>
+
+    <h2>Customer Acquisition Source</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Value (Count or %)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Organic Search</td><td>40</td></tr>
+            <tr><td>Paid Ads</td><td>25</td></tr>
+            <tr><td>Social Media</td><td>15</td></tr>
+            <tr><td>Referral</td><td>10</td></tr>
+            <tr><td>Direct</td><td>10</td></tr>
+        </tbody>
+        <caption>Data used for the Customer Acquisition Source doughnut chart.</caption>
+    </table>
+
+    <h2>Key Performance Indicators (KPIs)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>KPI Metric</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Total Revenue</td><td>213500 (USD)</td></tr>
+            <tr><td>New Customers</td><td>1250</td></tr>
+            <tr><td>Average Order Value (AOV)</td><td>170.80 (USD)</td></tr>
+            <tr><td>Conversion Rate</td><td>3.5 (%)</td></tr>
+        </tbody>
+        <caption>Data used for the KPI cards at the top of the dashboard.</caption>
+    </table>
+
+</body>
+</html>
