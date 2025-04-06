@@ -192,6 +192,34 @@
             display: flex;
             align-items: center;
         }
+
+        /* Keep only the nav-specific tooltip styles */
+        nav .emailLink {
+            position: relative;
+        }
+
+        nav .emailLink::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 5px 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        nav .emailLink:hover::after {
+            content: "marklknight00@outlook.com";
+            opacity: 1;
+            transform: translateX(-50%) translateY(5px);
+        }
     </style>
 </head>
 <body>
@@ -200,6 +228,9 @@
         <p>Computer Technician & IT Specialist</p>
     </header>
     <nav>
+        <a href="#" class="emailLink">Email</a>
+        <a href="https://www.linkedin.com/in/mark-knight-a32690344/">Linkedin</a>
+        <a href="https://github.com/noatuh">GitHub</a>
         <a href="#projects">Projects</a>
         <a href="#about-me">About Me</a>
         <a href="#contact">Contact</a>
@@ -355,7 +386,7 @@
         </section>
         <section id="contact">
             <h2>Contact</h2>
-            <p>Email: <a href="mailto:marklknight00@outlook.com">marklknight00@outlook.com</a></p>
+            <p>Email: <a href="marklknight00@outlook.com" class="emailLink">marklknight00@outlook.com</a></p>
             <p>GitHub: <a href="https://github.com/noatuh">https://github.com/noatuh</a></p>
             <p>Linkedin:<a href="https://www.linkedin.com/in/mark-knight-a32690344/"> https://www.linkedin.com/in/mark-knight</a></p>
   
@@ -426,6 +457,51 @@
       } else {
         themeToggle.innerHTML = '<span class="icon">☀️</span> Light';
       }
+    }
+  });
+
+  // Email copy functionality with inline notification
+  document.addEventListener('DOMContentLoaded', function() {
+    const emailLinks = document.querySelectorAll('.emailLink');
+    emailLinks.forEach(emailLink => {
+      emailLink.addEventListener('click', function(event) {
+          event.preventDefault();
+          navigator.clipboard.writeText('marklknight00@outlook.com').then(function() {
+              showNotification('Email copied to clipboard!');
+          }, function(err) {
+              console.error('Failed to copy email: ', err);
+          });
+      });
+    });
+  
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.innerText = message;
+      
+      // Style the notification to match the site's theme using CSS variables
+      notification.style.position = 'fixed';
+      notification.style.top = '20px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.padding = '10px 20px';
+      notification.style.borderRadius = '8px';
+      notification.style.background = 'var(--header-bg)';
+      notification.style.color = 'var(--header-text)';
+      notification.style.fontWeight = 'bold';
+      notification.style.zIndex = '10000';
+      notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+      notification.style.opacity = '1';
+      notification.style.transition = 'opacity 0.5s ease-out';
+      
+      document.body.appendChild(notification);
+      
+      // Remove notification after 2 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }, 2000);
     }
   });
 </script>
